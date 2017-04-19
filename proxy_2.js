@@ -1,18 +1,16 @@
-var request = require('request');
-var express = require('express')
-var app = express()
+var request=require('request');
+var redis = require('redis')
 
-app.get('/', function(req,res) {
-  //modify the url in any way you want
-  var newurl = 'http://192.168.33.50/';
-  request(newurl).pipe(res);
+var client = redis.createClient(6379, '127.0.0.1', {})
+request.get('http://192.168.33.10:4000/api/design/survey/vote/cast',function(err,res,body){
+  //if(err) //TODO: handle err
+  console.log(res.statusCode) //etc
+  if(res.statusCode==500)
+  {
+    client.lpop("servers", function(err,server){
+      if (err) throw err;
+      console.log(server)
+      })
+  }
+  //TODO Do something with response
 });
-
-var server = app.listen(3000, function () {
-var host = server.address().address
-var port = server.address().port
-console.log('Example app listening at http://%s:%s', host, port)
-//client.del("servers");
-//client.lpush("servers", "http://127.0.0.1"+":"+port);
- })
-
